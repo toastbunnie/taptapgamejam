@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Sample;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class UIManager : MonoBehaviour
     }
 
     public UIPanel[] panels;
+    [SerializeField] private TMPro.TMP_InputField passwordInput;
 
     private void Awake()
     {
@@ -46,5 +48,16 @@ public class UIManager : MonoBehaviour
         }
 
         Debug.LogWarning("找不到 UI 面板：" + panelName);
+    }
+
+    public void SubmitPassword(PasswordBox puzzle)
+    {
+        if (passwordInput == null || puzzle == null)
+        {
+            Debug.LogWarning("UIManager：密码输入框或密码谜题没有绑定！");
+            return;
+        }
+
+        puzzle.OnCodeSubmit(passwordInput.text);
     }
 }
