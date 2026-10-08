@@ -4,5 +4,20 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 807ec7a06823ba145b9f470832346149
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: f51ce0f093415474cbb382d02052bd6d
+  - enabled: 1
+    path: Assets/Scenes/InvestigationRevenge.unity
+    guid: 879e1518844136f439703f0c6ecda08f
+  - enabled: 1
+    path: Assets/Scenes/InvestigationWedding.unity
+    guid: 64944f7a6f6ce1445a4dc7513b9f8979
+  - enabled: 1
+    path: Assets/Scenes/Ending.unity
+    guid: 620532c2d8b51264f9807d48b714c526
   m_configObjects: {}
