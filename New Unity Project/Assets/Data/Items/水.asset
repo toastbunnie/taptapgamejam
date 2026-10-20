@@ -15,4 +15,4 @@ MonoBehaviour:
   itemId: shui
   itemName: "\u6C34"
   description: "\u6C34\uFF0C\u8C03\u914D\u548C\u89E3\u4E4B\u9152\u7684\u539F\u6599\u4E4B\u4E00\u3002"
-  icon: {fileID: 21300000, guid: 522b890a2fa003e4ab6eea3f73f3f344, type: 3}
+  icon: {fileID: 21300000, guid: a940a17f796b1ed4d9a31af3a542070a, type: 3}

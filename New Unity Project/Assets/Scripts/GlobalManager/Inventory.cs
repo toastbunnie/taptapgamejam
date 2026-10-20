@@ -105,8 +105,7 @@ namespace Game.Items
             Debug.Log($"[Inventory] ✨ 获得道具: {data.itemName}");
             OnItemAdded?.Invoke(data);
             DragDropRuleManager.ShowAcquisitionFeedback(
-                $"获得道具：{data.itemName}",
-                new Color(0.2f, 0.8f, 0.35f));
+                $"获得道具：{data.itemName}");
             return true;
         }
 
@@ -127,8 +126,19 @@ namespace Game.Items
             return true;
         }
 
-        // 清空（重置游戏用）
-        public void Clear() => _ownedIds.Clear();
+        // 清空（重置游戏用），并通知背包 UI 清理已显示的槽位。
+        public void Clear()
+        {
+            if (_ownedIds.Count == 0)
+                return;
+
+            string[] removedIds = new string[_ownedIds.Count];
+            _ownedIds.CopyTo(removedIds);
+            _ownedIds.Clear();
+
+            foreach (string itemId in removedIds)
+                OnItemRemoved?.Invoke(itemId);
+        }
 
         // 当前持有的所有 itemId（只读）
         public IReadOnlyCollection<string> AllOwnedIds => _ownedIds;

@@ -355,7 +355,6 @@ RectTransform:
   - {fileID: 686480659}
   - {fileID: 952728411}
   - {fileID: 1313009697}
-  - {fileID: 451371492}
   - {fileID: 1095412512}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -393,7 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e0bf888444c01c46930735433f218d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogueCsv: {fileID: 4900000, guid: e632fce310ddabc40bee159c05b80b4e, type: 3}
+  dialogueCsv: {fileID: 4900000, guid: 2184c27f29d084c4b93e467e09ccbbf9, type: 3}
 --- !u!4 &127110020
 Transform:
   m_ObjectHideFlags: 0
@@ -408,37 +407,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &451371491
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 451371492}
-  m_Layer: 0
-  m_Name: "\u5236\u4F5C\u4EBA\u5458\u540D\u5355"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &451371492
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 451371491}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -973.95374, y: -543.994, z: -0.23226003}
-  m_LocalScale: {x: 3.6641223, y: 3.6641223, z: 3.6641223}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 117841030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &532853093
 GameObject:
@@ -866,8 +834,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1174,7 +1142,7 @@ MonoBehaviour:
   - characterName: "\u624E\u62C9"
     expression: "\u526A\u5F71"
     avatar: {fileID: 21300000, guid: 347746deb9664344b9ae96eb6956c028, type: 3}
-  - characterName: "\u65B0\u90CE"
+  - characterName: "\u963F\u7279\u8428\u9A6C\u5179"
     expression: 
     avatar: {fileID: 21300000, guid: 79ea8495218979246b1edc10e794b44c, type: 3}
   - characterName: "\u7D22\u65AF\u5170"
@@ -1189,10 +1157,13 @@ MonoBehaviour:
   - characterName: "\u963F\u8D6B\u8428\u5C14"
     expression: 
     avatar: {fileID: 21300000, guid: 3a3d5fe0495417d42a49d3907438e39e, type: 3}
-  startId: 0
+  startId: 1
   dialogueFlags:
-  - endDialogueId: 42
+  - endDialogueId: 65
     flagName: ending1
+    flagValue: 1
+  - endDialogueId: 46
+    flagName: ending2
     flagValue: 1
   autoPlayOnSceneEnter: 1
 --- !u!4 &1086573632
@@ -1270,6 +1241,8 @@ MonoBehaviour:
   fadeDuration: 3
   cgDisplayDuration: 4
   cgFadeDuration: 1
+  creditsText: "\u611F\u8C22\u60A8\u7684\u6E38\u73A9\uFF01\n\u5236\u4F5C\u4EBA\u5458\uFF1A\n\u7B56\u5212\uFF1A\u4F0F\u7279\u52A0\u3001tanya\n\u6587\u6848\uFF1A\u5154\u53F8\n\u7F8E\u672F\uFF1A\u4E4B\u4E2D\u3001\u65B0\u6587\u3001\u5927\u7C73\n\u7A0B\u5E8F\uFF1A\u751C\u6C64\u3001\u5154\u6C41\n\u97F3\u6548\uFF1A\u4E09\u91D1"
+  creditsDisplayDuration: 3
   endingTitle: {fileID: 112360341}
   endingName: {fileID: 1428633493}
   restartButton: {fileID: 0}
@@ -1450,19 +1423,16 @@ MonoBehaviour:
   imageTransition: {fileID: 0}
   rules:
   - ruleName: "\u9009\u62E9\u539F\u8C05"
-    totalRequiredCount: 3
+    totalRequiredCount: 2
     requirements:
-    - sourceItemId: tiaojiezhijiu
+    - sourceItemId: hejiezhijiu
       targetId: daojutijiaochu
       requiredCount: 1
-    - sourceItemId: kongsuyishu
-      targetId: daojutijiaochu
-      requiredCount: 1
-    - sourceItemId: aosaitiyuanbing
+    - sourceItemId: yinjiaobei
       targetId: daojutijiaochu
       requiredCount: 1
     playDialogue: 1
-    dialogueId: 0
+    dialogueId: 22
     changeImage: 0
     triggerDialogueId: 0
     grantItem: 0
@@ -2038,7 +2008,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.08, y: 0.1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2049,7 +2019,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.2, y: 0.2}
+  m_Size: {x: 0.25, y: 0.6}
   m_EdgeRadius: 0
 --- !u!212 &1980343637
 SpriteRenderer:
@@ -2092,7 +2062,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2100,7 +2070,7 @@ SpriteRenderer:
   m_Size: {x: 5.76, y: 7.19}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1980343638
@@ -2112,7 +2082,7 @@ Transform:
   m_GameObject: {fileID: 1980343634}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2233,7 +2203,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

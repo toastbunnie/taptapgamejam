@@ -100,7 +100,7 @@ namespace Game.Items.DragDrop
         }
 
         /// <summary>Routes item and journal notifications through this scene's configured FeedbackText.</summary>
-        public static void ShowAcquisitionFeedback(string message, Color color)
+        public static void ShowAcquisitionFeedback(string message)
         {
             DragDropRuleManager manager = activeInstance;
 
@@ -110,7 +110,7 @@ namespace Game.Items.DragDrop
                 return;
             }
 
-            manager.ShowFeedback(message, color);
+            manager.ShowFeedback(message);
         }
 
         public void SetFeedbackText(TMP_Text text)
@@ -118,7 +118,7 @@ namespace Game.Items.DragDrop
             feedbackText = text;
         }
 
-        public void ShowFeedback(string message, Color color)
+        public void ShowFeedback(string message)
         {
             if (feedbackText == null)
                 return;
@@ -130,7 +130,7 @@ namespace Game.Items.DragDrop
             }
 
             feedbackText.text = message;
-            feedbackText.color = color;
+            feedbackText.color = new Color32(49, 52, 74, 255);
 
             if (feedbackDisplayDuration > 0f && !string.IsNullOrEmpty(message))
                 feedbackClearCoroutine = StartCoroutine(ClearFeedbackAfterDelay());
@@ -152,9 +152,9 @@ namespace Game.Items.DragDrop
                 return;
 
             if (success)
-                ShowFeedback($"{ruleName} 完成！", new Color(0.2f, 0.8f, 0.35f));
+                ShowFeedback($"{ruleName} 完成！");
             else
-                ShowFeedback($"{ruleName} 失败，重新尝试", new Color(0.9f, 0.35f, 0.35f));
+                ShowFeedback($"{ruleName} 失败，重新尝试");
         }
 
         private void SubscribeDialogueEvents()
@@ -308,29 +308,6 @@ namespace Game.Items.DragDrop
 
             activeRule = rule;
 
-            // 发放道具奖励
-            if (rule.grantItem && !rule.rewardIssued)
-            {
-                if (Inventory.Instance == null)
-                {
-                    Debug.LogError(
-                        $"[拖拽规则] {rule.ruleName}：找不到 Inventory，无法发放奖励。");
-                }
-                else if (string.IsNullOrWhiteSpace(rule.rewardItemId))
-                {
-                    Debug.LogWarning(
-                        $"[拖拽规则] {rule.ruleName}：奖励道具 ID 为空。");
-                }
-                else
-                {
-                    Inventory.Instance.Add(rule.rewardItemId);
-                    rule.rewardIssued = true;
-
-                    Debug.Log(
-                        $"[拖拽规则] {rule.ruleName}：获得道具 {rule.rewardItemId}");
-                }
-            }
-
             if (rule.changeImage && imageTransition != null)
                 imageTransition.ResetToState1();
 
@@ -346,8 +323,17 @@ namespace Game.Items.DragDrop
                 }
 
                 dialogueManager.StartMainDialogue(rule.dialogueId);
+                if (!dialogueManager.IsDialogueActive)
+                {
+                    // 无法启动配置的对白时，避免规则一直占用并漏发奖励。
+                    IssueReward(rule);
+                    activeRule = null;
+                }
                 return;
             }
+
+            // 不带对白的规则在判定成功后立即发奖。
+            IssueReward(rule);
 
             // 没有对话时，图片变化直接发生。
             if (rule.changeImage)
@@ -398,7 +384,35 @@ namespace Game.Items.DragDrop
             if (activeRule.changeImage && imageTransition != null)
                 imageTransition.CompleteTransition();
 
+            IssueReward(activeRule);
+
             activeRule = null;
+        }
+
+        private void IssueReward(DragRule rule)
+        {
+            if (rule == null || !rule.grantItem || rule.rewardIssued)
+                return;
+
+            if (Inventory.Instance == null)
+            {
+                Debug.LogError(
+                    $"[拖拽规则] {rule.ruleName}：找不到 Inventory，无法发放奖励。");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(rule.rewardItemId))
+            {
+                Debug.LogWarning(
+                    $"[拖拽规则] {rule.ruleName}：奖励道具 ID 为空。");
+                return;
+            }
+
+            Inventory.Instance.Add(rule.rewardItemId);
+            rule.rewardIssued = true;
+
+            Debug.Log(
+                $"[拖拽规则] {rule.ruleName}：获得道具 {rule.rewardItemId}");
         }
 
         private void ResetRuleCounts(DragRule rule)

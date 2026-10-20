@@ -31,7 +31,8 @@ public class EndingButton : MonoBehaviour
             return;
         }
 
-        bool unlocked = flagManager.GetFlag(endingData.endingFlag);
+        bool unlocked = EndingUnlockStore.IsUnlocked(endingData.endingFlag) ||
+                        flagManager.GetFlag(endingData.endingFlag);
 
         Debug.Log("Gallery检查：" + endingData.endingFlag + " = " + unlocked);
 
@@ -50,8 +51,10 @@ public class EndingButton : MonoBehaviour
         if (endingData == null)
             return;
 
-        bool unlocked = FindObjectOfType<FlagManager>()
-            .GetFlag(endingData.endingFlag);
+        bool unlocked = EndingUnlockStore.IsUnlocked(endingData.endingFlag);
+        FlagManager flagManager = FindObjectOfType<FlagManager>();
+        if (!unlocked && flagManager != null)
+            unlocked = flagManager.GetFlag(endingData.endingFlag);
 
         if (!unlocked)
             return;

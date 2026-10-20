@@ -172,7 +172,18 @@ public class SaveManager : MonoBehaviour
 
     public void StartNewGame(string firstSceneName)
     {
+        // 迁移旧版本存档中的结局标记，并让图库解锁跨周目保留。
+        if (CurrentSave != null)
+            EndingUnlockStore.PreserveFromFlags(CurrentSave.storyFlags);
+        if (FlagManager.Instance != null)
+            EndingUnlockStore.PreserveFromFlags(FlagManager.Instance.GetAllFlags());
+
         DeleteSave();
+        if (Game.Items.Inventory.Instance != null)
+            Game.Items.Inventory.Instance.Clear();
+
+        Game.Core.Emotion.EmotionBar.ResetForNewGame();
+
         if (FlagManager.Instance != null)
         {
             FlagManager.Instance.ResetFlags();

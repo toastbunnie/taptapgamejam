@@ -13,6 +13,8 @@ public class EndingEffect : MonoBehaviour
     public float fadeDuration = 5f;
     [Min(0f)] public float cgDisplayDuration = 2f;
     [Min(0f)] public float cgFadeDuration = 0.8f;
+    [TextArea(3, 8)] public string creditsText = "制作人员";
+    [Min(0f)] public float creditsDisplayDuration = 3f;
     public GameObject endingTitle;
     public GameObject endingName;
     public GameObject restartButton;
@@ -22,6 +24,20 @@ public class EndingEffect : MonoBehaviour
     private Material _centerRevealMaterial;
     private Coroutine _endingCoroutine;
     private float _fullMaskRadius = 1f;
+    private string _currentEndingTitle;
+    private string _currentEndingName;
+    private TMP_Text _endingTitleText;
+    private RectTransform _endingTitleRect;
+    private Vector2 _titleAnchorMin;
+    private Vector2 _titleAnchorMax;
+    private Vector2 _titleAnchoredPosition;
+    private Vector2 _titleSizeDelta;
+    private Vector2 _titlePivot;
+    private float _titleFontSize;
+    private float _titleFontSizeMin;
+    private float _titleFontSizeMax;
+    private bool _titleAutoSizing;
+    private TextAlignmentOptions _titleAlignment;
     private static readonly int CenterId = Shader.PropertyToID("_Center");
     private static readonly int RadiusId = Shader.PropertyToID("_Radius");
     private static readonly int SoftnessId = Shader.PropertyToID("_Softness");
@@ -30,7 +46,68 @@ public class EndingEffect : MonoBehaviour
 
     private void Awake()
     {
+        CacheEndingTitleLayout();
         EnsureMaskMaterial();
+    }
+
+    private void CacheEndingTitleLayout()
+    {
+        if (endingTitle == null)
+            return;
+
+        _endingTitleText = endingTitle.GetComponent<TMP_Text>();
+        if (_endingTitleText == null)
+            _endingTitleText = endingTitle.GetComponentInChildren<TMP_Text>(true);
+        if (_endingTitleText == null)
+            return;
+
+        _endingTitleRect = _endingTitleText.rectTransform;
+        _titleAnchorMin = _endingTitleRect.anchorMin;
+        _titleAnchorMax = _endingTitleRect.anchorMax;
+        _titleAnchoredPosition = _endingTitleRect.anchoredPosition;
+        _titleSizeDelta = _endingTitleRect.sizeDelta;
+        _titlePivot = _endingTitleRect.pivot;
+        _titleFontSize = _endingTitleText.fontSize;
+        _titleFontSizeMin = _endingTitleText.fontSizeMin;
+        _titleFontSizeMax = _endingTitleText.fontSizeMax;
+        _titleAutoSizing = _endingTitleText.enableAutoSizing;
+        _titleAlignment = _endingTitleText.alignment;
+    }
+
+    private void ConfigureCreditsLayout()
+    {
+        if (_endingTitleText == null || _endingTitleRect == null)
+            return;
+
+        _endingTitleRect.anchorMin = new Vector2(0.04f, 0.05f);
+        _endingTitleRect.anchorMax = new Vector2(0.96f, 0.95f);
+        _endingTitleRect.pivot = new Vector2(0.5f, 0.5f);
+        _endingTitleRect.anchoredPosition = Vector2.zero;
+        _endingTitleRect.sizeDelta = Vector2.zero;
+
+        _endingTitleText.enableAutoSizing = true;
+        _endingTitleText.fontSize = 48f;
+        _endingTitleText.fontSizeMin = 28f;
+        _endingTitleText.fontSizeMax = 48f;
+        _endingTitleText.alignment = TextAlignmentOptions.Center;
+        _endingTitleText.enableWordWrapping = true;
+    }
+
+    private void RestoreEndingTitleLayout()
+    {
+        if (_endingTitleText == null || _endingTitleRect == null)
+            return;
+
+        _endingTitleRect.anchorMin = _titleAnchorMin;
+        _endingTitleRect.anchorMax = _titleAnchorMax;
+        _endingTitleRect.anchoredPosition = _titleAnchoredPosition;
+        _endingTitleRect.sizeDelta = _titleSizeDelta;
+        _endingTitleRect.pivot = _titlePivot;
+        _endingTitleText.fontSize = _titleFontSize;
+        _endingTitleText.fontSizeMin = _titleFontSizeMin;
+        _endingTitleText.fontSizeMax = _titleFontSizeMax;
+        _endingTitleText.enableAutoSizing = _titleAutoSizing;
+        _endingTitleText.alignment = _titleAlignment;
     }
 
     public void SetEndingCG(Sprite cg)
@@ -56,6 +133,8 @@ public class EndingEffect : MonoBehaviour
 
         SetText(endingTitle, data.endingTitle);
         SetText(endingName, data.endingName);
+        _currentEndingTitle = data.endingTitle;
+        _currentEndingName = data.endingName;
         SetEndingCG(data.endingCG);
         maskColor = data.maskColor;
         EnsureMaskMaterial();
@@ -144,6 +223,17 @@ public class EndingEffect : MonoBehaviour
         // 黑色再次从中心扩散，盖住 CG 后显示结局信息。
         yield return AnimateMask(0f, _fullMaskRadius);
 
+        // CG 结束后先在全黑画面显示制作人员，再显示结局信息。
+        ConfigureCreditsLayout();
+        SetText(endingTitle, creditsText);
+        SetActiveIfAssigned(endingTitle, true);
+        SetActiveIfAssigned(endingName, false);
+        if (creditsDisplayDuration > 0f)
+            yield return new WaitForSecondsRealtime(creditsDisplayDuration);
+
+        RestoreEndingTitleLayout();
+        SetText(endingTitle, _currentEndingTitle);
+        SetText(endingName, _currentEndingName);
         SetActiveIfAssigned(endingTitle, true);
         SetActiveIfAssigned(endingName, true);
         SetActiveIfAssigned(restartButton, true);

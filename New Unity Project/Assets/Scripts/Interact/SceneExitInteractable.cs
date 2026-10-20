@@ -2,6 +2,7 @@
 using UnityEngine;
 using Game.Core.Interaction;
 using Game.Core.SceneTransition;
+using Game.Items;
 
 public class SceneExitInteractable : MonoBehaviour, IInteractable
 {
@@ -16,20 +17,27 @@ public class SceneExitInteractable : MonoBehaviour, IInteractable
     [SerializeField] private string requiredFlagName = "";
     [SerializeField] private bool requiredFlagValue = true;
 
+    [Header("道具解锁条件")]
+    [SerializeField] private bool requireItem = false;
+    [SerializeField] private string requiredItemId = "";
+
     public string PromptText => promptText;
 
     public bool CanInteract
     {
         get
         {
-            if (!requireFlag)
-                return true;
-
-            if (FlagManager.Instance == null)
+            if (requireFlag &&
+                (FlagManager.Instance == null ||
+                 FlagManager.Instance.GetFlag(requiredFlagName) != requiredFlagValue))
                 return false;
 
-            return FlagManager.Instance.GetFlag(requiredFlagName)
-                == requiredFlagValue;
+            if (requireItem &&
+                (Inventory.Instance == null ||
+                 !Inventory.Instance.Has(requiredItemId)))
+                return false;
+
+            return true;
         }
     }
 

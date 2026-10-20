@@ -65,6 +65,7 @@ public class EndingSequenceController : MonoBehaviour
             if (!FlagManager.Instance.GetFlag(ending.endingFlag))
                 continue;
 
+            EndingUnlockStore.Unlock(ending.endingFlag);
             endingPlayed = true;
             endingEffect.PlayEnding(ending);
             return;

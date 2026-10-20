@@ -167,12 +167,23 @@ namespace Game.Core.Emotion
         /// <summary>重置情绪条（新一轮）</summary>
         public void ResetEmotion()
         {
+            ResetForNewGame();
+        }
+
+        /// <summary>重置静态情绪数据；主菜单开始新游戏时也可在未加载情绪条场景时调用。</summary>
+        public static void ResetForNewGame()
+        {
             s_currentValue = 0f;
             s_warmTriggeredThisCycle = false;
             s_hotTriggeredThisCycle = false;
             s_fillColor = Color.white;
-            ClearSegmentData();
-            RebuildSegmentViews();
+            s_segments.Clear();
+
+            if (Instance != null)
+            {
+                Instance.RebuildSegmentViews();
+                Instance.UpdateVisuals();
+            }
         }
 
         private void UpdateVisuals()

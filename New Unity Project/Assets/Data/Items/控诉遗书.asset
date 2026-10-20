@@ -15,4 +15,4 @@ MonoBehaviour:
   itemId: kongsuyishu
   itemName: "\u63A7\u8BC9\u9057\u4E66"
   description: "\u624E\u62C9\u7559\u4E0B\u7684\u9057\u4E66\u3002"
-  icon: {fileID: 21300000, guid: 522b890a2fa003e4ab6eea3f73f3f344, type: 3}
+  icon: {fileID: 21300000, guid: ae6d7772525c62e44ada8ff88033bfed, type: 3}
