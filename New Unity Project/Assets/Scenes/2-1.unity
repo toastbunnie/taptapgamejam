@@ -1144,10 +1144,11 @@ MonoBehaviour:
   requireFlag: 0
   requiredFlagName: 
   requiredFlagValue: 0
-  inspectionFlagName: 
+  inspectionFlagName: brother_bed_inspected
   inspectionFlagValue: 1
   clueIdToUnlock: suosilan
   infoText: 
+  alreadyInspectedInfoText: "\u5E8A\u4E0A\u53EA\u5269\u4E0B\u51B7\u6389\u7684\u6BE1\u5B50\uFF0C\u54E5\u54E5\u5DF2\u7ECF\u4E0D\u4F1A\u518D\u56DE\u5E94\u4F60\u4E86\u3002"
   storyDialogueId: 9
 --- !u!61 &1314576267
 BoxCollider2D:

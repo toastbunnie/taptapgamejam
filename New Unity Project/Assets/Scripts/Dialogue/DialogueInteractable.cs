@@ -25,6 +25,10 @@ public class DialogueInteractable : MonoBehaviour, IInteractable
     [SerializeField] private string inspectionFlagName = "";
     [SerializeField] private bool inspectionFlagValue = true;
 
+    [Header("重复点击行为")]
+    [Tooltip("启用后首次点击执行原交互，之后显示已调查信息。")]
+    [SerializeField] private bool useRepeatInteractionInfo = true;
+
     [Header("点击时解锁手记线索")]
     [Tooltip("填写 JournalEntryData.clueId；留空则不解锁线索")]
     [SerializeField] private string clueIdToUnlock = "";
@@ -32,6 +36,12 @@ public class DialogueInteractable : MonoBehaviour, IInteractable
     [Header("点击显示的信息")]
     [TextArea(2, 5)]
     [SerializeField] private string infoText;
+
+    [Header("已调查后的重复点击信息")]
+    [TextArea(2, 5)]
+    [SerializeField] private string alreadyInspectedInfoText;
+
+    private const string DefaultAlreadyInspectedInfoText = "你已经调查过这里了。";
     
     private string displayName;
     private string position;
@@ -59,25 +69,64 @@ public class DialogueInteractable : MonoBehaviour, IInteractable
 
     public void Interact(GameObject player)
     {
-        if (!string.IsNullOrWhiteSpace(inspectionFlagName))
-        {
-            if (FlagManager.Instance == null)
-            {
-                Debug.LogError("场景中没有找到 FlagManager。", this);
-                return;
-            }
-
-            FlagManager.Instance.SetFlag(
-                inspectionFlagName,
-                inspectionFlagValue
-            );
-        }
-
         DialogueManager manager = FindObjectOfType<DialogueManager>();
         if (manager == null)
         {
             Debug.LogError($"[{nameof(DialogueInteractable)}] 场景中没有找到 DialogueManager。", this);
             return;
+        }
+
+        if ((interactionType == InteractionType.InfoThenStory ||
+             interactionType == InteractionType.StartStory) && storyDialogueId < 0)
+        {
+            Debug.LogError($"[{nameof(DialogueInteractable)}] {name} 需要填写有效的主线剧情 ID。", this);
+            return;
+        }
+
+        bool shouldTrackInspection =
+            useRepeatInteractionInfo ||
+            !string.IsNullOrWhiteSpace(inspectionFlagName);
+        bool wasAlreadyInspected = false;
+
+        if (shouldTrackInspection)
+        {
+            if (FlagManager.Instance == null)
+            {
+                if (!string.IsNullOrWhiteSpace(inspectionFlagName))
+                {
+                    Debug.LogError("场景中没有找到 FlagManager。", this);
+                    return;
+                }
+            }
+            else
+            {
+                string effectiveFlagName = GetEffectiveInspectionFlagName();
+                wasAlreadyInspected =
+                    FlagManager.Instance.HasFlag(effectiveFlagName) &&
+                    FlagManager.Instance.GetFlag(effectiveFlagName)
+                    == inspectionFlagValue;
+
+                if (!wasAlreadyInspected)
+                {
+                    FlagManager.Instance.SetFlag(
+                        effectiveFlagName,
+                        inspectionFlagValue
+                    );
+                }
+            }
+
+            if (useRepeatInteractionInfo && wasAlreadyInspected)
+            {
+                manager.ShowTemporaryInfo(
+                    string.IsNullOrWhiteSpace(alreadyInspectedInfoText)
+                        ? DefaultAlreadyInspectedInfoText
+                        : alreadyInspectedInfoText,
+                    displayName,
+                    position,
+                    avatar
+                );
+                return;
+            }
         }
 
         switch (interactionType)
@@ -88,25 +137,30 @@ public class DialogueInteractable : MonoBehaviour, IInteractable
                 break;
 
             case InteractionType.InfoThenStory:
-                if (storyDialogueId < 0)
-                {
-                    Debug.LogError($"[{nameof(DialogueInteractable)}] {name} 需要填写有效的主线剧情 ID。", this);
-                    return;
-                }
                 manager.ShowTemporaryInfo(infoText, displayName, position, avatar, storyDialogueId);
                 UnlockJournalClue();
                 break;
 
             case InteractionType.StartStory:
-                if (storyDialogueId < 0)
-                {
-                    Debug.LogError($"[{nameof(DialogueInteractable)}] {name} 需要填写有效的主线剧情 ID。", this);
-                    return;
-                }
                 manager.StartMainDialogue(storyDialogueId);
                 UnlockJournalClue();
                 break;
         }
+    }
+
+    private string GetEffectiveInspectionFlagName()
+    {
+        if (!string.IsNullOrWhiteSpace(inspectionFlagName))
+            return inspectionFlagName.Trim();
+
+        string objectPath = $"{transform.name}[{transform.GetSiblingIndex()}]";
+        for (Transform parent = transform.parent; parent != null; parent = parent.parent)
+        {
+            objectPath =
+                $"{parent.name}[{parent.GetSiblingIndex()}]/{objectPath}";
+        }
+
+        return $"interaction:{gameObject.scene.name}:{objectPath}";
     }
 
     private void UnlockJournalClue()

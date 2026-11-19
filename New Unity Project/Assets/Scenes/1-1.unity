@@ -291,7 +291,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: c26494d8089da53428e0bfe33f689ed8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1065,7 +1065,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: a52a94194dcf55843b066ed7273e718f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1636,8 +1636,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: 
   infoText: 
+  alreadyInspectedInfoText: 
   storyDialogueId: 0
 --- !u!1001 &1918485543
 PrefabInstance:
@@ -2234,8 +2236,8 @@ SceneRoots:
   - {fileID: 431088009}
   - {fileID: 2031100003}
   - {fileID: 1795222182}
-  - {fileID: 1091713367}
   - {fileID: 161145612}
+  - {fileID: 1091713367}
   - {fileID: 1189277895}
   - {fileID: 1086573632}
   - {fileID: 1506475095}

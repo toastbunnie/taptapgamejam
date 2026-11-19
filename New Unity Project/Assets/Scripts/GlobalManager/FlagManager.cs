@@ -52,6 +52,12 @@ public class FlagManager : MonoBehaviour
             && value;
     }
 
+    public bool HasFlag(string flagName)
+    {
+        return !string.IsNullOrWhiteSpace(flagName) &&
+            flags.ContainsKey(flagName);
+    }
+
     // 导出所有标记
     public List<FlagEntry> GetAllFlags()
     {
