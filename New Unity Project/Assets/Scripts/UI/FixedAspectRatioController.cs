@@ -13,6 +13,7 @@ namespace Game.UI
     public class FixedAspectRatioController : MonoBehaviour
     {
         private const float TargetAspect = 16f / 9f;
+        private const int ScreenCanvasSortingOrder = 5000;
         private static readonly Vector2 ReferenceResolution =
             new Vector2(1920f, 1080f);
         private static FixedAspectRatioController _instance;
@@ -83,8 +84,6 @@ namespace Game.UI
 
             if (cameraChanged || screenChanged)
                 RefreshDisplayLayout();
-            else
-                BindScreenCanvases();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -174,6 +173,8 @@ namespace Game.UI
 
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
                 canvas.worldCamera = _gameCamera;
+                canvas.overrideSorting = true;
+                canvas.sortingOrder = ScreenCanvasSortingOrder;
                 canvas.planeDistance = Mathf.Clamp(
                     1f,
                     _gameCamera.nearClipPlane + 0.01f,
