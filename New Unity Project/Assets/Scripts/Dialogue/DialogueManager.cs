@@ -58,6 +58,9 @@ namespace Game.Dialogue
         // 每条普通台词开始显示，参数是该台词的 ID
         public event Action<int> DialogueRecordStarted;
 
+        // 场景载入后恢复的剧情进度，用于同步由先前台词解锁的场景状态。
+        public event Action<int> DialogueProgressLoaded;
+
         // 一段主线对话真正结束
         public event Action DialogueFinished;
 
@@ -112,7 +115,10 @@ namespace Game.Dialogue
             RestoreSavedBGM();
 
             if (autoPlayOnSceneEnter)
+            {
+                DialogueProgressLoaded?.Invoke(currentId);
                 ShowCurrentDialogue();
+            }
         }
 
         private void Update()
@@ -250,6 +256,8 @@ namespace Game.Dialogue
             temporaryNextStoryId = nextStoryId;
             isFinished = false;
 
+            RecordHistory(characterName, content);
+
             dialogueUI.ShowDialogue(
                 characterName,
                 content,
@@ -364,6 +372,8 @@ namespace Game.Dialogue
 
             if (bracketIndex >= 0)
                 displayName = displayName.Substring(0, bracketIndex).Trim();
+
+            RecordHistory(displayName, record.content);
 
             // 通知订阅者：当前 ID 对应的台词即将显示
             DialogueRecordStarted?.Invoke(currentId);
@@ -501,10 +511,28 @@ namespace Game.Dialogue
             SaveManager.Instance.SaveDialogueProgress(sceneName, currentId);
         }
 
+        public void SaveCurrentProgressNow()
+        {
+            if (!isTemporaryInfo)
+                SaveCurrentProgress();
+        }
+
+        private void RecordHistory(string speaker, string content)
+        {
+            if (SaveManager.Instance == null)
+                return;
+
+            string sceneName =
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            SaveManager.Instance.AddDialogueHistory(sceneName, speaker, content);
+        }
+
         private void OnOptionSelected(DialogueRecord option)
         {
             if (isFinished)
                 return;
+
+            RecordHistory("玩家", option.content);
 
             currentId = option.nextId;
 

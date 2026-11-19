@@ -40,6 +40,7 @@ public sealed class DialogueBackgroundSwitcher : MonoBehaviour
     private DialogueManager dialogueManager;
     private Coroutine changeCoroutine;
     private float originalAlpha = 1f;
+    private int restoredThroughDialogueId = int.MinValue;
 
     private void Awake()
     {
@@ -57,13 +58,19 @@ public sealed class DialogueBackgroundSwitcher : MonoBehaviour
             dialogueManager = GetComponent<DialogueManager>();
 
         if (dialogueManager != null)
+        {
             dialogueManager.DialogueRecordStarted += OnDialogueRecordStarted;
+            dialogueManager.DialogueProgressLoaded += RestoreProgress;
+        }
     }
 
     private void OnDisable()
     {
         if (dialogueManager != null)
+        {
             dialogueManager.DialogueRecordStarted -= OnDialogueRecordStarted;
+            dialogueManager.DialogueProgressLoaded -= RestoreProgress;
+        }
 
         if (changeCoroutine != null)
         {
@@ -75,6 +82,10 @@ public sealed class DialogueBackgroundSwitcher : MonoBehaviour
 
     private void OnDialogueRecordStarted(int dialogueId)
     {
+        // Scene-load restoration already applied all changes up to this line.
+        if (dialogueId <= restoredThroughDialogueId)
+            return;
+
         foreach (BackgroundChange change in changes)
         {
             if (change == null || change.dialogueId != dialogueId ||
@@ -83,6 +94,32 @@ public sealed class DialogueBackgroundSwitcher : MonoBehaviour
 
             ChangeBackground(change);
             return;
+        }
+    }
+
+    private void RestoreProgress(int dialogueId)
+    {
+        restoredThroughDialogueId = dialogueId;
+
+        BackgroundChange latestBackgroundChange = null;
+        foreach (BackgroundChange change in changes)
+        {
+            if (change == null || change.dialogueId > dialogueId)
+                continue;
+
+            ActivateObjects(change);
+            if (change.background != null &&
+                (latestBackgroundChange == null ||
+                 change.dialogueId > latestBackgroundChange.dialogueId))
+            {
+                latestBackgroundChange = change;
+            }
+        }
+
+        if (latestBackgroundChange != null)
+        {
+            SetSprite(latestBackgroundChange.background);
+            SetAlpha(originalAlpha);
         }
     }
 

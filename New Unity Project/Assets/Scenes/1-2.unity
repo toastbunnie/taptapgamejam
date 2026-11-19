@@ -159,8 +159,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: 
   infoText: 
+  alreadyInspectedInfoText: 
   storyDialogueId: 14
 --- !u!61 &56913270
 BoxCollider2D:
@@ -443,6 +445,108 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 790776240}
   m_CullTransparentMesh: 1
+--- !u!1001 &803684331
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1189277895}
+    m_Modifications:
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3891051000067066245, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+      propertyPath: m_Name
+      value: SettingsUI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+--- !u!224 &803684332 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1870261395848423298, guid: e2ccbec9cc42f994c8532e1f83a43dae, type: 3}
+  m_PrefabInstance: {fileID: 803684331}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &869416362
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,8 +629,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: 
   infoText: "\u522B\u4EBA\u7684\u623F\u95F4\uFF0C\u8FD8\u662F\u4E0D\u8981\u8FDB\u53BB\u4E86\u3002"
+  alreadyInspectedInfoText: 
   storyDialogueId: -1
 --- !u!61 &933452667
 BoxCollider2D:
@@ -862,8 +968,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: shibananchen
   infoText: "\u901A\u5F80\u957F\u8005\u8BAE\u4E8B\u5904\u7684\u77F3\u677F\u8DEF\u3002\u77F3\u677F\u4E0A\u6709\u4E00\u4E9B\u6697\u6C89\u7684\u6EF4\u75D5\uFF0C\u50CF\u662F\u8840\u8FF9\u3002"
+  alreadyInspectedInfoText: 
   storyDialogueId: -1
 --- !u!61 &1050415823
 BoxCollider2D:
@@ -1014,8 +1122,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: xiedouxinwen
   infoText: 
+  alreadyInspectedInfoText: 
   storyDialogueId: 18
 --- !u!61 &1075793250
 BoxCollider2D:
@@ -1237,6 +1347,7 @@ RectTransform:
   - {fileID: 1426757098}
   - {fileID: 1887312662}
   - {fileID: 1008883951}
+  - {fileID: 803684332}
   - {fileID: 1879049543}
   - {fileID: 790776241}
   m_Father: {fileID: 0}
@@ -1707,8 +1818,10 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
+  useRepeatInteractionInfo: 1
   clueIdToUnlock: peidaiduandao
   infoText: "\u8BB8\u591A\u6751\u6C11\u4F69\u6234\u7740\u77ED\u5200\uFF0C\u795E\u8272\u8B66\u60D5\u3002"
+  alreadyInspectedInfoText: 
   storyDialogueId: -1
 --- !u!61 &1613803485
 BoxCollider2D:

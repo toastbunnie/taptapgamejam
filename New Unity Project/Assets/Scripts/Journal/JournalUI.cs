@@ -47,6 +47,7 @@ public class JournalUI : MonoBehaviour
     private JournalClueView firstSelectedClue;
     private JournalClueView secondSelectedClue;
     private bool isReasoningMode = false;
+    private Game.UI.SettingsPanelOpenButton settingsOpenButton;
 
     // 当前页组，从 0 开始
     private int currentPageGroup = 0;
@@ -55,6 +56,8 @@ public class JournalUI : MonoBehaviour
     {
         if (!UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Journal))
             return;
+
+        SetSettingsEntryVisible(false);
 
         currentPageGroup = 0;
 
@@ -105,6 +108,17 @@ public class JournalUI : MonoBehaviour
             if (overlayImage != null)
                 overlayImage.raycastTarget = false;
         }
+
+        SetSettingsEntryVisible(true);
+    }
+
+    private void SetSettingsEntryVisible(bool visible)
+    {
+        if (settingsOpenButton == null)
+            settingsOpenButton = FindObjectOfType<Game.UI.SettingsPanelOpenButton>(true);
+
+        if (settingsOpenButton != null)
+            settingsOpenButton.gameObject.SetActive(visible);
     }
 
     public void NextPage()

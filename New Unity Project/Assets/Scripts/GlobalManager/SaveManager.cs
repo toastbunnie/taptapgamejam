@@ -9,6 +9,14 @@ public class SaveManager : MonoBehaviour
     public static SaveManager Instance { get; private set; }
 
     [Serializable]
+    public class DialogueHistoryEntry
+    {
+        public string sceneName;
+        public string speaker;
+        public string content;
+    }
+
+    [Serializable]
     public class SaveData
     {
         public string sceneName;
@@ -27,6 +35,10 @@ public class SaveManager : MonoBehaviour
 
         // 当前背包物品。旧版存档没有此字段时按空背包处理。
         public List<string> ownedItemIds = new List<string>();
+
+        // 已显示的对话与调查文字，供历史回顾页面使用。
+        public List<DialogueHistoryEntry> dialogueHistory =
+            new List<DialogueHistoryEntry>();
     }
 
     private string SavePath =>
@@ -67,6 +79,47 @@ public class SaveManager : MonoBehaviour
         CurrentSave.hasDialogueProgress = true;
 
         WriteToDisk();
+    }
+
+    public void AddDialogueHistory(string sceneName, string speaker, string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return;
+
+        if (CurrentSave == null)
+            CurrentSave = new SaveData();
+        if (CurrentSave.dialogueHistory == null)
+            CurrentSave.dialogueHistory = new List<DialogueHistoryEntry>();
+
+        CurrentSave.dialogueHistory.Add(new DialogueHistoryEntry
+        {
+            sceneName = string.IsNullOrWhiteSpace(sceneName)
+                ? SceneManager.GetActiveScene().name
+                : sceneName,
+            speaker = speaker ?? "",
+            content = content
+        });
+
+        const int maxHistoryEntries = 1000;
+        if (CurrentSave.dialogueHistory.Count > maxHistoryEntries)
+            CurrentSave.dialogueHistory.RemoveRange(
+                0, CurrentSave.dialogueHistory.Count - maxHistoryEntries);
+
+        WriteToDisk();
+    }
+
+    public List<DialogueHistoryEntry> GetDialogueHistory()
+    {
+        if (CurrentSave == null || CurrentSave.dialogueHistory == null)
+            return new List<DialogueHistoryEntry>();
+
+        return new List<DialogueHistoryEntry>(CurrentSave.dialogueHistory);
+    }
+
+    public void SaveCurrentData()
+    {
+        if (CurrentSave != null)
+            WriteToDisk();
     }
 
     // 保存当前背景音乐状态，不覆盖已有的剧情进度

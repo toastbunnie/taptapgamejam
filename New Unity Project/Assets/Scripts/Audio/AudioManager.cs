@@ -45,25 +45,17 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        // Awake 阶段所有单例都已初始化；读取已保存的值并订阅实时变化。
+        // 读取保存值；SettingsManager 在用户拖动滑块时会直接应用新音量。
         SettingsManager settings = SettingsManager.Instance;
         if (settings == null)
             return;
 
-        settings.OnMusicVolumeChanged.AddListener(SetMusicVolume);
-        settings.OnSoundVolumeChanged.AddListener(SetSoundVolume);
         SetMusicVolume(settings.MusicVolume);
         SetSoundVolume(settings.SoundVolume);
     }
 
     private void OnDestroy()
     {
-        if (SettingsManager.Instance != null)
-        {
-            SettingsManager.Instance.OnMusicVolumeChanged.RemoveListener(SetMusicVolume);
-            SettingsManager.Instance.OnSoundVolumeChanged.RemoveListener(SetSoundVolume);
-        }
-
         if (Instance == this)
             Instance = null;
     }
@@ -155,13 +147,13 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip, volumeScale);
     }
 
-    private void SetMusicVolume(float volume)
+    public void SetMusicVolume(float volume)
     {
         musicVolume = Mathf.Clamp01(volume);
         ApplyBGMVolume();
     }
 
-    private void SetSoundVolume(float volume)
+    public void SetSoundVolume(float volume)
     {
         soundVolume = Mathf.Clamp01(volume);
         if (sfxSource != null)
