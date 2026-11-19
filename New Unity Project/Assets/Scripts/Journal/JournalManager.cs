@@ -60,8 +60,7 @@ public class JournalManager : MonoBehaviour
             if (showAcquisitionFeedback)
             {
                 DragDropRuleManager.ShowAcquisitionFeedback(
-                    "新线索已记入手记",
-                    new Color(0.2f, 0.8f, 0.35f));
+                    "新线索已记入手记");
             }
 
             if (SaveManager.Instance != null)

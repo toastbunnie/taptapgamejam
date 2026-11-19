@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Game.Core.Interaction;
 
 public class PlayerInteraction : MonoBehaviour
@@ -25,6 +24,12 @@ public class PlayerInteraction : MonoBehaviour
 
     private void TryInteract()
     {
+        // Only modal settings/history panels should block scene interactions.
+        // A global EventSystem pointer check can get stuck on unrelated or
+        // invisible graphics and prevent all later scene clicks.
+        if (Game.UI.SettingsPanel.IsBlockingSceneInput)
+            return;
+
         // 特写面板打开期间冻结场景点击，防止点击穿透到背景物体。
         if (SinkCloseupInteractable.IsAnyOpen ||
             CloseupPanelInteractable.IsAnyOpen)

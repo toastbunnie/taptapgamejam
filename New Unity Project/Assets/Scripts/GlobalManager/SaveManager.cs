@@ -9,6 +9,21 @@ public class SaveManager : MonoBehaviour
     public static SaveManager Instance { get; private set; }
 
     [Serializable]
+    public class DialogueHistoryEntry
+    {
+        public string sceneName;
+        public string speaker;
+        public string content;
+    }
+
+    [Serializable]
+    public class EmotionSegmentSaveData
+    {
+        public float value;
+        public Color color;
+    }
+
+    [Serializable]
     public class SaveData
     {
         public string sceneName;
@@ -24,6 +39,22 @@ public class SaveManager : MonoBehaviour
         // 当前存档中的剧情标记
         public List<FlagManager.FlagEntry> storyFlags =
             new List<FlagManager.FlagEntry>();
+
+        // 当前背包物品。旧版存档没有此字段时按空背包处理。
+        public List<string> ownedItemIds = new List<string>();
+
+        // 已显示的对话与调查文字，供历史回顾页面使用。
+        public List<DialogueHistoryEntry> dialogueHistory =
+            new List<DialogueHistoryEntry>();
+
+        // 情绪条状态随现有存档保存，不另建存档文件。
+        public bool hasEmotionState;
+        public float emotionValue;
+        public bool emotionWarmTriggered;
+        public bool emotionHotTriggered;
+        public Color emotionFillColor = Color.white;
+        public List<EmotionSegmentSaveData> emotionSegments =
+            new List<EmotionSegmentSaveData>();
     }
 
     private string SavePath =>
@@ -62,6 +93,74 @@ public class SaveManager : MonoBehaviour
         CurrentSave.sceneName = sceneName;
         CurrentSave.dialogueId = dialogueId;
         CurrentSave.hasDialogueProgress = true;
+
+        WriteToDisk();
+    }
+
+    public void AddDialogueHistory(string sceneName, string speaker, string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return;
+
+        if (CurrentSave == null)
+            CurrentSave = new SaveData();
+        if (CurrentSave.dialogueHistory == null)
+            CurrentSave.dialogueHistory = new List<DialogueHistoryEntry>();
+
+        CurrentSave.dialogueHistory.Add(new DialogueHistoryEntry
+        {
+            sceneName = string.IsNullOrWhiteSpace(sceneName)
+                ? SceneManager.GetActiveScene().name
+                : sceneName,
+            speaker = speaker ?? "",
+            content = content
+        });
+
+        const int maxHistoryEntries = 1000;
+        if (CurrentSave.dialogueHistory.Count > maxHistoryEntries)
+            CurrentSave.dialogueHistory.RemoveRange(
+                0, CurrentSave.dialogueHistory.Count - maxHistoryEntries);
+
+        WriteToDisk();
+    }
+
+    public List<DialogueHistoryEntry> GetDialogueHistory()
+    {
+        if (CurrentSave == null || CurrentSave.dialogueHistory == null)
+            return new List<DialogueHistoryEntry>();
+
+        return new List<DialogueHistoryEntry>(CurrentSave.dialogueHistory);
+    }
+
+    public void SaveCurrentData()
+    {
+        if (CurrentSave != null)
+            WriteToDisk();
+    }
+
+    public void SaveEmotionState(
+        float value,
+        bool warmTriggered,
+        bool hotTriggered,
+        Color fillColor,
+        List<EmotionSegmentSaveData> segments)
+    {
+        if (CurrentSave == null)
+        {
+            CurrentSave = new SaveData
+            {
+                sceneName = SceneManager.GetActiveScene().name
+            };
+        }
+
+        CurrentSave.hasEmotionState = true;
+        CurrentSave.emotionValue = value;
+        CurrentSave.emotionWarmTriggered = warmTriggered;
+        CurrentSave.emotionHotTriggered = hotTriggered;
+        CurrentSave.emotionFillColor = fillColor;
+        CurrentSave.emotionSegments = segments != null
+            ? new List<EmotionSegmentSaveData>(segments)
+            : new List<EmotionSegmentSaveData>();
 
         WriteToDisk();
     }
@@ -129,6 +228,32 @@ public class SaveManager : MonoBehaviour
         WriteToDisk();
     }
 
+    // 保存当前背包，不覆盖已有的场景、对话或剧情进度。
+    public void SaveInventory(List<string> itemIds)
+    {
+        if (CurrentSave == null)
+            return;
+
+        CurrentSave.ownedItemIds = itemIds != null
+            ? new List<string>(itemIds)
+            : new List<string>();
+
+        WriteToDisk();
+    }
+
+    // 从存档恢复背包；不存在 Inventory 时由场景初始化流程处理。
+    private void RestoreInventory()
+    {
+        if (Game.Items.Inventory.Instance == null)
+        {
+            Debug.LogWarning("[SaveManager] 找不到 Inventory，暂时无法恢复背包物品。");
+            return;
+        }
+
+        Game.Items.Inventory.Instance.RestoreItems(
+            CurrentSave != null ? CurrentSave.ownedItemIds : null);
+    }
+
     // 读取当前存档中的手记线索
     public List<string> LoadUnlockedClues()
     {
@@ -166,13 +291,25 @@ public class SaveManager : MonoBehaviour
 
         // 在加载场景之前恢复剧情标记
         RestoreStoryFlags();
+        RestoreInventory();
 
         SceneManager.LoadScene(CurrentSave.sceneName);
     }
 
     public void StartNewGame(string firstSceneName)
     {
+        // 迁移旧版本存档中的结局标记，并让图库解锁跨周目保留。
+        if (CurrentSave != null)
+            EndingUnlockStore.PreserveFromFlags(CurrentSave.storyFlags);
+        if (FlagManager.Instance != null)
+            EndingUnlockStore.PreserveFromFlags(FlagManager.Instance.GetAllFlags());
+
         DeleteSave();
+        if (Game.Items.Inventory.Instance != null)
+            Game.Items.Inventory.Instance.Clear();
+
+        Game.Core.Emotion.EmotionBar.ResetForNewGame();
+
         if (FlagManager.Instance != null)
         {
             FlagManager.Instance.ResetFlags();

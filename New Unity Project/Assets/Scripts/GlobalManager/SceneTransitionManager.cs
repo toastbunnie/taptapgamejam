@@ -70,39 +70,78 @@ namespace Game.Core.SceneTransition
         // 淡出到黑屏，然后加载新场景，再淡入回来
         public void FadeToScene(string sceneName)
         {
-            if (_isFading) return;
-            StartCoroutine(FadeToSceneRoutine(sceneName));
+            StartExclusive(FadeToSceneRoutine(sceneName));
         }
 
         // 单独淡出到黑屏（覆盖屏幕）
         public void FadeIn(Action onComplete = null)
         {
-            if (_isFading) return;
-            StartCoroutine(FadeRoutine(1f, onComplete));
+            StartExclusive(FadeRoutine(1f, onComplete));
         }
 
         // 单独淡入回来（变透明看到场景）
         public void FadeOut(Action onComplete = null)
         {
-            if (_isFading) return;
-            StartCoroutine(FadeRoutine(0f, onComplete));
+            StartExclusive(FadeRoutine(0f, onComplete));
         }
 
         public bool IsFading => _isFading;
 
+        private void StartExclusive(IEnumerator routine)
+        {
+            if (_isFading)
+                return;
+
+            // Lock synchronously so another request in the same frame cannot overlap.
+            _isFading = true;
+            StartCoroutine(ExclusiveRoutine(routine));
+        }
+
+        private IEnumerator ExclusiveRoutine(IEnumerator routine)
+        {
+            try
+            {
+                yield return StartCoroutine(routine);
+            }
+            finally
+            {
+                _isFading = false;
+            }
+        }
+
         private IEnumerator FadeToSceneRoutine(string sceneName)
         {
-            _isFading = true;
+            if (string.IsNullOrWhiteSpace(sceneName) ||
+                !Application.CanStreamedLevelBeLoaded(sceneName))
+            {
+                Debug.LogError(
+                    $"[SceneTransition] 加载失败：场景 '{sceneName}' 不在 Build Settings 或拼错！");
+                yield break;
+            }
+
             yield return FadeRoutine(1f, null);
-            var op = SceneManager.LoadSceneAsync(sceneName);
+
+            AsyncOperation op = null;
+            try
+            {
+                op = SceneManager.LoadSceneAsync(sceneName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(
+                    $"[SceneTransition] 加载场景 '{sceneName}' 时发生异常：{e.Message}");
+            }
+
             if (op == null)
             {
                 Debug.LogError($"[SceneTransition] 加载失败：场景 '{sceneName}' 不在 Build Settings 或拼错！");
+                // Keep the current scene visible if loading could not begin.
+                yield return FadeRoutine(0f, null);
                 yield break;
             }
+
             while (!op.isDone) yield return null;
             yield return FadeRoutine(0f, null);
-            _isFading = false;
         }
 
         private IEnumerator FadeRoutine(float targetAlpha, Action onComplete)
@@ -112,7 +151,7 @@ namespace Game.Core.SceneTransition
 
             while (timer < fadeDuration)
             {
-                timer += Time.deltaTime;
+                timer += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(timer / fadeDuration);
                 SetAlpha(Mathf.Lerp(startAlpha, targetAlpha, t));
                 yield return null;

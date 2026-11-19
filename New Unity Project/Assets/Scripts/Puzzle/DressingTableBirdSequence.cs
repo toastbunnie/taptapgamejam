@@ -17,6 +17,8 @@ public sealed class DressingTableBirdSequence : MonoBehaviour
     [SerializeField] private DialogueManager dialogueManager;
     [SerializeField] private int dialogueId = -1;
     [SerializeField] private string rewardItemId;
+    [SerializeField] private string clueIdToUnlock;
+    [SerializeField] private string completionFlagName;
 
     private bool sequenceStarted;
     private bool awaitingDialogueStart;
@@ -84,6 +86,18 @@ public sealed class DressingTableBirdSequence : MonoBehaviour
             return;
 
         waitingForDialogue = false;
+        if (!string.IsNullOrWhiteSpace(completionFlagName))
+        {
+            if (FlagManager.Instance != null)
+                FlagManager.Instance.SetFlag(completionFlagName.Trim(), true);
+            else
+                Debug.LogWarning(
+                    $"[{nameof(DressingTableBirdSequence)}] 找不到 FlagManager，无法设置剧情标记 {completionFlagName}。",
+                    this);
+        }
+
+        UnlockJournalClue();
+
         if (Inventory.Instance == null)
         {
             Debug.LogError(
@@ -95,5 +109,22 @@ public sealed class DressingTableBirdSequence : MonoBehaviour
         rewardGranted = Inventory.Instance.Add(rewardItemId);
         if (rewardGranted)
             Debug.Log($"[{nameof(DressingTableBirdSequence)}] 对话结束，获得道具 {rewardItemId}。", this);
+    }
+
+    private void UnlockJournalClue()
+    {
+        if (!string.IsNullOrWhiteSpace(clueIdToUnlock))
+        {
+            if (JournalManager.Instance == null)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(DressingTableBirdSequence)}] 找不到 JournalManager，无法解锁线索 {clueIdToUnlock}。",
+                    this);
+            }
+            else
+            {
+                JournalManager.Instance.UnlockClue(clueIdToUnlock.Trim());
+            }
+        }
     }
 }

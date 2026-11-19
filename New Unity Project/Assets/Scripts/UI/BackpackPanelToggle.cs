@@ -26,6 +26,12 @@ namespace Game.UI
                 return;
 
             bool willOpen = !backpackPanel.activeSelf;
+            if (willOpen &&
+                !UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Backpack))
+            {
+                return;
+            }
+
             backpackPanel.SetActive(willOpen);
             RefreshButtonImage();
 

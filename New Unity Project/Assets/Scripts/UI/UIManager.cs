@@ -44,3 +44,55 @@ public class UIManager : MonoBehaviour
         puzzle.OnCodeSubmit(passwordInput.text);
     }
 }
+
+/// <summary>
+/// Keeps the exploration panels mutually exclusive without ending or advancing dialogue.
+/// </summary>
+public static class UIPanelExclusivity
+{
+    public enum Panel
+    {
+        Backpack,
+        Journal,
+        Dialogue,
+        Settings
+    }
+
+    public static bool TryOpen(Panel panel)
+    {
+        Game.Dialogue.DialogueManager dialogueManager =
+            Object.FindObjectOfType<Game.Dialogue.DialogueManager>();
+
+        if (panel != Panel.Dialogue &&
+            dialogueManager != null &&
+            dialogueManager.IsDialogueActive)
+        {
+            return false;
+        }
+
+        if (panel != Panel.Backpack)
+        {
+            Game.UI.BackpackPanelToggle backpack =
+                Object.FindObjectOfType<Game.UI.BackpackPanelToggle>(true);
+            if (backpack != null)
+                backpack.Close();
+        }
+
+        if (panel != Panel.Journal)
+        {
+            JournalUI journal = Object.FindObjectOfType<JournalUI>(true);
+            if (journal != null)
+                journal.CloseJournal();
+        }
+
+        if (panel != Panel.Settings)
+        {
+            Game.UI.SettingsPanel settings =
+                Object.FindObjectOfType<Game.UI.SettingsPanel>(true);
+            if (settings != null)
+                settings.Hide(immediate: true);
+        }
+
+        return true;
+    }
+}

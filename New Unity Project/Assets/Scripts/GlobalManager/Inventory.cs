@@ -103,10 +103,10 @@ namespace Game.Items
         {
             _ownedIds.Add(data.itemId);
             Debug.Log($"[Inventory] ✨ 获得道具: {data.itemName}");
+            SaveInventory();
             OnItemAdded?.Invoke(data);
             DragDropRuleManager.ShowAcquisitionFeedback(
-                $"获得道具：{data.itemName}",
-                new Color(0.2f, 0.8f, 0.35f));
+                $"获得道具：{data.itemName}");
             return true;
         }
 
@@ -123,12 +123,47 @@ namespace Game.Items
             if (!_ownedIds.Remove(itemId)) return false;
 
             Debug.Log($"[Inventory] 🗑 移除道具: {itemId}");
+            SaveInventory();
             OnItemRemoved?.Invoke(itemId);
             return true;
         }
 
-        // 清空（重置游戏用）
-        public void Clear() => _ownedIds.Clear();
+        // 清空（重置游戏用），并通知背包 UI 清理已显示的槽位。
+        public void Clear()
+        {
+            string[] removedIds = new string[_ownedIds.Count];
+            _ownedIds.CopyTo(removedIds);
+            _ownedIds.Clear();
+
+            SaveInventory();
+
+            foreach (string itemId in removedIds)
+                OnItemRemoved?.Invoke(itemId);
+        }
+
+        // 继续游戏时静默恢复数据；场景中的 InventoryUI 会在初始化时同步槽位。
+        public void RestoreItems(IEnumerable<string> itemIds)
+        {
+            _ownedIds.Clear();
+
+            if (_database == null || itemIds == null)
+                return;
+
+            foreach (string itemId in itemIds)
+            {
+                if (!string.IsNullOrWhiteSpace(itemId) &&
+                    _database.Get(itemId) != null)
+                {
+                    _ownedIds.Add(itemId);
+                }
+            }
+        }
+
+        private void SaveInventory()
+        {
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.SaveInventory(new List<string>(_ownedIds));
+        }
 
         // 当前持有的所有 itemId（只读）
         public IReadOnlyCollection<string> AllOwnedIds => _ownedIds;

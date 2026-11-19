@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class EndingButton : MonoBehaviour
 {
@@ -23,15 +24,12 @@ public class EndingButton : MonoBehaviour
             return;
         }
 
-        FlagManager flagManager = FindObjectOfType<FlagManager>();
-
-        if (flagManager == null)
-        {
-            Debug.LogError("找不到 FlagManager！");
-            return;
-        }
-
-        bool unlocked = flagManager.GetFlag(endingData.endingFlag);
+        // Gallery access is based only on the persistent unlock written after
+        // the ending presentation completes.
+        bool unlocked = EndingUnlockStore.IsUnlocked(endingData.endingFlag);
+        Button button = GetComponent<Button>();
+        if (button != null)
+            button.interactable = unlocked;
 
         Debug.Log("Gallery检查：" + endingData.endingFlag + " = " + unlocked);
 
@@ -50,12 +48,14 @@ public class EndingButton : MonoBehaviour
         if (endingData == null)
             return;
 
-        bool unlocked = FindObjectOfType<FlagManager>()
-            .GetFlag(endingData.endingFlag);
-
-        if (!unlocked)
+        if (!EndingUnlockStore.IsUnlocked(endingData.endingFlag))
+        {
+            if (cgViewer != null)
+                cgViewer.CloseCG();
             return;
+        }
 
-        cgViewer.ShowCG(endingData.endingCG);
+        if (cgViewer != null)
+            cgViewer.ShowEnding(endingData);
     }
 }

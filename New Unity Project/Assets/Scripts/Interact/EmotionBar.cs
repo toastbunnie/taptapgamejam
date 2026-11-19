@@ -56,6 +56,7 @@ namespace Game.Core.Emotion
 
         private Sprite _generatedFillSprite;
         private bool _ownsGeneratedFillSprite;
+        private bool _restoredFromSave;
         private readonly List<Image> _segmentViews = new List<Image>();
 
         public float CurrentValue => s_currentValue;
@@ -97,7 +98,16 @@ namespace Game.Core.Emotion
                 _fillImage.enabled = false;
             }
 
+            RestoreSavedStateIfAvailable();
             RebuildSegmentViews();
+        }
+
+        private void Start()
+        {
+            // SaveManager may initialize after this component when a scene is
+            // launched directly instead of loaded from the main menu.
+            if (!_restoredFromSave && RestoreSavedStateIfAvailable())
+                RebuildSegmentViews();
         }
 
         private void OnDestroy()
@@ -135,6 +145,7 @@ namespace Game.Core.Emotion
 
             RebuildSegmentViews();
             CheckThresholds();
+            SaveState();
         }
 
         /// <summary>直接设置填充长度和颜色，供需要定制显示的情绪触发点使用。</summary>
@@ -147,6 +158,70 @@ namespace Game.Core.Emotion
                 s_segments.Add(new EmotionSegmentData(s_currentValue, fillColor));
             RebuildSegmentViews();
             CheckThresholds();
+            SaveState();
+        }
+
+        private bool RestoreSavedStateIfAvailable()
+        {
+            SaveManager.SaveData save = SaveManager.Instance != null
+                ? SaveManager.Instance.CurrentSave
+                : null;
+            if (save == null || !save.hasEmotionState)
+                return false;
+
+            s_currentValue = Mathf.Clamp(save.emotionValue, 0f, _maxValue);
+            s_warmTriggeredThisCycle = save.emotionWarmTriggered;
+            s_hotTriggeredThisCycle = save.emotionHotTriggered;
+            s_fillColor = save.emotionFillColor;
+            s_segments.Clear();
+
+            float remainingValue = s_currentValue;
+            if (save.emotionSegments != null)
+            {
+                foreach (SaveManager.EmotionSegmentSaveData savedSegment in save.emotionSegments)
+                {
+                    if (savedSegment == null || remainingValue <= 0f)
+                        continue;
+
+                    float segmentValue = Mathf.Clamp(savedSegment.value, 0f, remainingValue);
+                    if (segmentValue <= 0f)
+                        continue;
+
+                    s_segments.Add(new EmotionSegmentData(segmentValue, savedSegment.color));
+                    remainingValue -= segmentValue;
+                }
+            }
+
+            // Fill any difference caused by older saves or a changed max value.
+            if (remainingValue > 0.0001f)
+                s_segments.Add(new EmotionSegmentData(remainingValue, s_fillColor));
+
+            _restoredFromSave = true;
+            return true;
+        }
+
+        private void SaveState()
+        {
+            if (SaveManager.Instance == null)
+                return;
+
+            List<SaveManager.EmotionSegmentSaveData> savedSegments =
+                new List<SaveManager.EmotionSegmentSaveData>(s_segments.Count);
+            foreach (EmotionSegmentData segment in s_segments)
+            {
+                savedSegments.Add(new SaveManager.EmotionSegmentSaveData
+                {
+                    value = segment.value,
+                    color = segment.color
+                });
+            }
+
+            SaveManager.Instance.SaveEmotionState(
+                s_currentValue,
+                s_warmTriggeredThisCycle,
+                s_hotTriggeredThisCycle,
+                s_fillColor,
+                savedSegments);
         }
 
         private void CheckThresholds()
@@ -167,12 +242,23 @@ namespace Game.Core.Emotion
         /// <summary>重置情绪条（新一轮）</summary>
         public void ResetEmotion()
         {
+            ResetForNewGame();
+        }
+
+        /// <summary>重置静态情绪数据；主菜单开始新游戏时也可在未加载情绪条场景时调用。</summary>
+        public static void ResetForNewGame()
+        {
             s_currentValue = 0f;
             s_warmTriggeredThisCycle = false;
             s_hotTriggeredThisCycle = false;
             s_fillColor = Color.white;
-            ClearSegmentData();
-            RebuildSegmentViews();
+            s_segments.Clear();
+
+            if (Instance != null)
+            {
+                Instance.RebuildSegmentViews();
+                Instance.UpdateVisuals();
+            }
         }
 
         private void UpdateVisuals()

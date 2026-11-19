@@ -24,6 +24,17 @@ namespace Game.Items
 
         private bool _collected;
 
+        private void Start()
+        {
+            // A scene reload recreates world objects, so hide pickups already
+            // represented in the persistent inventory save.
+            if (Inventory.Instance != null && Inventory.Instance.Has(_itemId))
+            {
+                _collected = true;
+                gameObject.SetActive(false);
+            }
+        }
+
         // ---------- IInteractable ----------
         public string PromptText => string.Empty;
         public bool CanInteract => !_collected && !string.IsNullOrEmpty(_itemId);
