@@ -24,6 +24,9 @@ public class SaveManager : MonoBehaviour
         // 当前存档中的剧情标记
         public List<FlagManager.FlagEntry> storyFlags =
             new List<FlagManager.FlagEntry>();
+
+        // 当前背包物品。旧版存档没有此字段时按空背包处理。
+        public List<string> ownedItemIds = new List<string>();
     }
 
     private string SavePath =>
@@ -129,6 +132,32 @@ public class SaveManager : MonoBehaviour
         WriteToDisk();
     }
 
+    // 保存当前背包，不覆盖已有的场景、对话或剧情进度。
+    public void SaveInventory(List<string> itemIds)
+    {
+        if (CurrentSave == null)
+            return;
+
+        CurrentSave.ownedItemIds = itemIds != null
+            ? new List<string>(itemIds)
+            : new List<string>();
+
+        WriteToDisk();
+    }
+
+    // 从存档恢复背包；不存在 Inventory 时由场景初始化流程处理。
+    private void RestoreInventory()
+    {
+        if (Game.Items.Inventory.Instance == null)
+        {
+            Debug.LogWarning("[SaveManager] 找不到 Inventory，暂时无法恢复背包物品。");
+            return;
+        }
+
+        Game.Items.Inventory.Instance.RestoreItems(
+            CurrentSave != null ? CurrentSave.ownedItemIds : null);
+    }
+
     // 读取当前存档中的手记线索
     public List<string> LoadUnlockedClues()
     {
@@ -166,6 +195,7 @@ public class SaveManager : MonoBehaviour
 
         // 在加载场景之前恢复剧情标记
         RestoreStoryFlags();
+        RestoreInventory();
 
         SceneManager.LoadScene(CurrentSave.sceneName);
     }
