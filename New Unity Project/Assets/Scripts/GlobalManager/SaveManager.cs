@@ -17,6 +17,13 @@ public class SaveManager : MonoBehaviour
     }
 
     [Serializable]
+    public class EmotionSegmentSaveData
+    {
+        public float value;
+        public Color color;
+    }
+
+    [Serializable]
     public class SaveData
     {
         public string sceneName;
@@ -39,6 +46,15 @@ public class SaveManager : MonoBehaviour
         // 已显示的对话与调查文字，供历史回顾页面使用。
         public List<DialogueHistoryEntry> dialogueHistory =
             new List<DialogueHistoryEntry>();
+
+        // 情绪条状态随现有存档保存，不另建存档文件。
+        public bool hasEmotionState;
+        public float emotionValue;
+        public bool emotionWarmTriggered;
+        public bool emotionHotTriggered;
+        public Color emotionFillColor = Color.white;
+        public List<EmotionSegmentSaveData> emotionSegments =
+            new List<EmotionSegmentSaveData>();
     }
 
     private string SavePath =>
@@ -120,6 +136,33 @@ public class SaveManager : MonoBehaviour
     {
         if (CurrentSave != null)
             WriteToDisk();
+    }
+
+    public void SaveEmotionState(
+        float value,
+        bool warmTriggered,
+        bool hotTriggered,
+        Color fillColor,
+        List<EmotionSegmentSaveData> segments)
+    {
+        if (CurrentSave == null)
+        {
+            CurrentSave = new SaveData
+            {
+                sceneName = SceneManager.GetActiveScene().name
+            };
+        }
+
+        CurrentSave.hasEmotionState = true;
+        CurrentSave.emotionValue = value;
+        CurrentSave.emotionWarmTriggered = warmTriggered;
+        CurrentSave.emotionHotTriggered = hotTriggered;
+        CurrentSave.emotionFillColor = fillColor;
+        CurrentSave.emotionSegments = segments != null
+            ? new List<EmotionSegmentSaveData>(segments)
+            : new List<EmotionSegmentSaveData>();
+
+        WriteToDisk();
     }
 
     // 保存当前背景音乐状态，不覆盖已有的剧情进度

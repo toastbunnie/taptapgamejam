@@ -25,6 +25,8 @@ namespace Game.UI
         [SerializeField] private Button _reloadButton;      // 右下"重载当前环境"
         [SerializeField] private Button _mainMenuButton;
         [SerializeField] private Button _historyButton;
+        [SerializeField] private Button _windowModeButton;
+        [SerializeField] private Button _fullscreenModeButton;
         [SerializeField] private TMP_FontAsset _historyFont;
 
         [Header("Animation")]
@@ -71,6 +73,7 @@ namespace Game.UI
             if (_reloadButton != null) _reloadButton.onClick.AddListener(OnReloadClicked);
             if (_mainMenuButton != null) _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
             if (_historyButton != null) _historyButton.onClick.AddListener(OnHistoryClicked);
+            BindDisplayModeButtons();
         }
 
         void Update()
@@ -199,6 +202,29 @@ namespace Game.UI
         {
             if (SettingsManager.Instance != null)
                 SettingsManager.Instance.ReloadCurrentEnvironment();
+        }
+
+        private void BindDisplayModeButtons()
+        {
+            if (_windowModeButton == null)
+                _windowModeButton = transform.Find("ChangeView1")?.GetComponent<Button>();
+            if (_fullscreenModeButton == null)
+                _fullscreenModeButton = transform.Find("ChangeView2")?.GetComponent<Button>();
+
+            if (_windowModeButton != null)
+                _windowModeButton.onClick.AddListener(OnWindowModeClicked);
+            if (_fullscreenModeButton != null)
+                _fullscreenModeButton.onClick.AddListener(OnFullscreenModeClicked);
+        }
+
+        private void OnWindowModeClicked()
+        {
+            SettingsManager.Instance?.SetFullscreen(false);
+        }
+
+        private void OnFullscreenModeClicked()
+        {
+            SettingsManager.Instance?.SetFullscreen(true);
         }
 
         private void OnMainMenuClicked()

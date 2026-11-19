@@ -12,6 +12,12 @@ namespace Game.UI
     {
         public static SettingsManager Instance { get; private set; }
 
+        private const string FullscreenPreferenceKey = "DisplayFullscreen";
+        private const int ReferenceWidth = 1920;
+        private const int ReferenceHeight = 1080;
+
+        public bool IsFullscreen { get; private set; }
+
         [Header("Volume (0-1)")]
         [Range(0f, 1f)] public float SoundVolume = 1f;
         [Range(0f, 1f)] public float MusicVolume = 1f;
@@ -33,6 +39,42 @@ namespace Game.UI
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadFromPrefs();
+
+            IsFullscreen = PlayerPrefs.GetInt(FullscreenPreferenceKey, 0) == 1;
+            ApplyDisplayMode();
+        }
+
+        public void SetFullscreen(bool fullscreen)
+        {
+            IsFullscreen = fullscreen;
+            PlayerPrefs.SetInt(FullscreenPreferenceKey, IsFullscreen ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyDisplayMode();
+        }
+
+        private void ApplyDisplayMode()
+        {
+#if UNITY_EDITOR
+            // Let the Game view control its own aspect ratio during Play mode.
+            // The actual window/fullscreen mode is applied in standalone builds.
+            return;
+#else
+            if (IsFullscreen)
+            {
+                Resolution desktop = Screen.currentResolution;
+                Screen.SetResolution(
+                    desktop.width,
+                    desktop.height,
+                    FullScreenMode.FullScreenWindow);
+            }
+            else
+            {
+                Screen.SetResolution(
+                    ReferenceWidth,
+                    ReferenceHeight,
+                    FullScreenMode.Windowed);
+            }
+#endif
         }
 
         public void SetSoundVolume(float v) 
