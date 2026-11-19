@@ -1879,6 +1879,8 @@ MonoBehaviour:
   dialogueManager: {fileID: 1086573631}
   dialogueId: 29
   rewardItemId: kongsuyishu
+  clueIdToUnlock: shenminvzi
+  completionFlagName: zahra_side_room_investigated
 --- !u!1 &1817334707
 GameObject:
   m_ObjectHideFlags: 0

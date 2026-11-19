@@ -50,6 +50,12 @@ public class JournalClueView : MonoBehaviour
                 entryData.clueId
             );
 
+        if (unlocked && !string.IsNullOrWhiteSpace(entryData.requiredFlagName))
+        {
+            unlocked = FlagManager.Instance != null &&
+                FlagManager.Instance.GetFlag(entryData.requiredFlagName);
+        }
+
         bool onCurrentPage =
             entryData.pageGroup == currentPageGroup;
 

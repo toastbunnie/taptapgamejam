@@ -20,4 +20,7 @@ public class JournalEntryData : ScriptableObject
     [Header("所在页组")]
     [Min(0)]
     public int pageGroup = 0;
+
+    [Tooltip("填写剧情标记名后，只有标记为 true 时才显示这条线索。")]
+    public string requiredFlagName;
 }

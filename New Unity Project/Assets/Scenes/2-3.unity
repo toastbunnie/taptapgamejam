@@ -355,7 +355,7 @@ MonoBehaviour:
   requiredFlagValue: 1
   inspectionFlagName: 
   inspectionFlagValue: 1
-  clueIdToUnlock: shenminvzi
+  clueIdToUnlock: 
   infoText: "\u4E00\u540D\u6B63\u5728\u54ED\u6CE3\u7684\u795E\u79D8\u5973\u5B50\u3002"
   storyDialogueId: -1
 --- !u!61 &219021889

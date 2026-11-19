@@ -17,6 +17,7 @@ namespace Game.Dialogue
         [SerializeField] private Image leftAvatar;
         [SerializeField] private TMP_Text leftNameText;
         [SerializeField] private TMP_Text leftContentText;
+        [SerializeField] private GameObject characterBorder;
 
         [Header("右侧布局组件")]
         [SerializeField] private Image rightAvatar;
@@ -55,6 +56,9 @@ namespace Game.Dialogue
             TMP_Text nameText = showRight
                 ? rightNameText
                 : leftNameText;
+
+            if (characterBorder != null)
+                characterBorder.SetActive(avatar != null);
 
             currentContentText = showRight
                 ? rightContentText
