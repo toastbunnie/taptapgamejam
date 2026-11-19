@@ -213,6 +213,8 @@ namespace Game.Dialogue
                 return;
             }
 
+            UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Dialogue);
+
             isTemporaryInfo = false;
             temporaryNextStoryId = -1;
             isFinished = false;
@@ -241,6 +243,8 @@ namespace Game.Dialogue
                 Debug.LogError("[DialogueManager] 无法显示调查信息：未绑定 DialogueUI。");
                 return;
             }
+
+            UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Dialogue);
 
             isTemporaryInfo = true;
             temporaryNextStoryId = nextStoryId;

@@ -74,6 +74,9 @@ namespace Game.UI
         public void Show()
         {
             if (_isOpen) return;
+            if (!UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Settings))
+                return;
+
             _isOpen = true;
             if (_fadeCo != null) StopCoroutine(_fadeCo);
             gameObject.SetActive(true);

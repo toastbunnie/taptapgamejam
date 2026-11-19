@@ -53,6 +53,9 @@ public class JournalUI : MonoBehaviour
 
     public void OpenJournal()
     {
+        if (!UIPanelExclusivity.TryOpen(UIPanelExclusivity.Panel.Journal))
+            return;
+
         currentPageGroup = 0;
 
         if (darkOverlay != null)
