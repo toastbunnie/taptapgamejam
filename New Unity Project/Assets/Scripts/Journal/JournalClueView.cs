@@ -64,7 +64,8 @@ public class JournalClueView : MonoBehaviour
             SetSelected(false);
 
         // 翻页只隐藏不属于当前页的线索，不取消其选中状态。
-        SetVisible(unlocked && onCurrentPage);
+        bool visible = unlocked && onCurrentPage;
+        SetVisible(visible);
 
         if (titleText != null)
             titleText.text = entryData.clueTitle;
@@ -87,7 +88,14 @@ public class JournalClueView : MonoBehaviour
         // 当前页不可见时，禁止点击，但不清除选中状态。
         Button button = GetComponent<Button>();
         if (button != null)
+        {
             button.interactable = visible;
+
+            // The card background sits outside VisualRoot. Disable its raycast
+            // while hidden so it cannot block a visible clue behind it.
+            if (button.targetGraphic != null)
+                button.targetGraphic.raycastTarget = visible;
+        }
 
         // 高亮只在卡片可见时显示。
         if (selectedHighlight != null)
